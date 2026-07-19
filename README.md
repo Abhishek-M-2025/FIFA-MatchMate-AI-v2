@@ -187,7 +187,7 @@ The application adheres to WCAG best practices:
 In the root directory, create a `.env` file (copied from `.env.example`).
 ```ini
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
-PORT=8001
+PORT=8000
 VITE_API_URL=http://localhost:8000
 ```
 
