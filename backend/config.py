@@ -21,7 +21,7 @@ class Settings:
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://fifa-match-mate-ai-v2-663q.vercel.app"
+    "https://fifa-match-mate-ai-v2-5u7u.vercel.app"
 ]
 
 settings = Settings()
