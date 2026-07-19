@@ -247,9 +247,9 @@ npm run test
 
 ## 👨‍💻 Author
 
-**Abhishek** ❤️
+Made by **Abhishek** with ❤️ for **Prompt Wars Virtual Challenge 4**
 
-Made with ❤️ for **Prompt Wars Virtual Challenge 4**
+---
 
 ## 📄 License
 
