@@ -1,4 +1,4 @@
-import { LiveData, WeatherInfo } from './types';
+import { LiveData, WeatherInfo, AlertInfo } from './types';
 
 export async function getLiveData(): Promise<LiveData> {
   const res = await fetch('/api/live-data');
@@ -30,7 +30,7 @@ export async function sendChatMessage(message: string, role: string): Promise<{ 
   return res.json();
 }
 
-export async function triggerAlert(severity: string, title: string): Promise<any> {
+export async function triggerAlert(severity: string, title: string): Promise<{ message: string; alert: AlertInfo }> {
   const res = await fetch('/api/alerts/trigger', {
     method: 'POST',
     headers: {
@@ -43,3 +43,4 @@ export async function triggerAlert(severity: string, title: string): Promise<any
   }
   return res.json();
 }
+

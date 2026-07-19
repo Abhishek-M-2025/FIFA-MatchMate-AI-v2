@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX, MessageSquare, Compass } from 'lucide-react';
 import { sendChatMessage } from '../api';
+import { sanitizeInput } from '../utils/sanitize';
 
 interface AIChatVoiceProps {
   role: 'fan' | 'organizer';
@@ -10,6 +11,34 @@ interface Message {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
+}
+
+// Custom Speech Recognition interface declarations to ensure type safety
+interface SpeechRecognitionEvent {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message?: string;
+}
+
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  lang: string;
+  interimResults: boolean;
+  onstart: () => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
 }
 
 export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
@@ -27,14 +56,14 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
   const [speechSupported, setSpeechSupported] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   // Check Web Speech API support
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       setSpeechSupported(true);
-      const rec = new SpeechRecognition();
+      const rec = new SpeechRecognition() as SpeechRecognitionInstance;
       rec.continuous = false;
       rec.lang = 'en-US';
       rec.interimResults = false;
@@ -43,15 +72,15 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
         setIsListening(true);
       };
 
-      rec.onresult = (event: any) => {
+      rec.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         if (transcript) {
           handleSendMessage(transcript);
         }
       };
 
-      rec.onerror = (err: any) => {
-        console.error('Speech Recognition Error:', err);
+      rec.onerror = (err: SpeechRecognitionErrorEvent) => {
+        console.error('Speech Recognition Error:', err.error);
         setIsListening(false);
       };
 
@@ -109,13 +138,13 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
   };
 
   const handleSendMessage = async (textToSend: string) => {
-    const trimmed = textToSend.trim();
-    if (!trimmed) return;
+    const sanitized = sanitizeInput(textToSend);
+    if (!sanitized) return;
 
     // Add user message
     const userMsg: Message = {
       sender: 'user',
-      text: trimmed,
+      text: sanitized,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -124,7 +153,7 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
 
     try {
       // Fetch response from FastAPI proxy
-      const data = await sendChatMessage(trimmed, role);
+      const data = await sendChatMessage(sanitized, role);
       const aiMsg: Message = {
         sender: 'ai',
         text: data.response,
@@ -145,11 +174,11 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
   };
 
   return (
-    <div className="glass-panel w-full h-[520px] rounded-3xl border border-slate-800 flex flex-col overflow-hidden shadow-xl">
+    <div className="glass-panel w-full h-[520px] rounded-3xl border border-slate-800 flex flex-col overflow-hidden shadow-xl" role="region" aria-label="MatchMate AI Chat Room">
       {/* Panel Header */}
       <div className="px-5 py-4 border-b border-slate-800 bg-slate-950/40 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-emerald-400" />
+          <MessageSquare className="w-5 h-5 text-emerald-400" aria-hidden="true" />
           <div>
             <h3 className="font-bold text-slate-200">MatchMate Assistant</h3>
             <p className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider flex items-center gap-1">
@@ -169,12 +198,13 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
               window.speechSynthesis.cancel();
             }
           }}
-          className={`p-2 rounded-xl border transition-all ${
+          className={`p-2 rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
             ttsEnabled
               ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-              : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-350'
+              : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
           }`}
           title={ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
+          aria-label={ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech"}
         >
           {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
@@ -229,7 +259,7 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
       )}
 
       {/* Preset Action Recommendations */}
-      <div className="px-4 py-2 bg-slate-950/80 border-t border-slate-850 flex gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+      <div className="px-4 py-2 bg-slate-950/80 border-t border-slate-850 flex gap-2 overflow-x-auto no-scrollbar scroll-smooth" role="group" aria-label="Preset Questions">
         {[
           "Which gate is shortest wait?",
           "Are there Zone B parking spots?",
@@ -239,7 +269,7 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
           <button
             key={i}
             onClick={() => handleSendMessage(rec)}
-            className="whitespace-nowrap px-3 py-1 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white rounded-full text-xs border border-slate-800 font-medium transition-all"
+            className="whitespace-nowrap px-3 py-1 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white rounded-full text-xs border border-slate-800 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
           >
             {rec}
           </button>
@@ -257,12 +287,13 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
         <button
           type="button"
           onClick={toggleListening}
-          className={`p-3.5 rounded-xl border transition-all ${
+          className={`p-3.5 rounded-xl border transition-all focus:outline-none focus:ring-2 ${
             isListening
               ? 'bg-red-500 text-white border-red-400 glow-red animate-pulse'
-              : 'bg-slate-900 border-slate-850 text-slate-400 hover:text-white hover:bg-slate-850'
+              : 'bg-slate-900 border-slate-850 text-slate-400 hover:text-white hover:bg-slate-850 focus:ring-emerald-500/50'
           }`}
           title={isListening ? "Stop Listening" : "Ask by Voice"}
+          aria-label={isListening ? "Stop Listening" : "Ask by Voice"}
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
@@ -272,13 +303,15 @@ export const AIChatVoice: React.FC<AIChatVoiceProps> = ({ role }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask a question about the stadium..."
-          className="flex-1 bg-slate-900/80 border border-slate-850 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-medium"
+          aria-label="Stadium question input"
+          className="flex-1 bg-slate-900/80 border border-slate-855 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-medium"
         />
 
         <button
           type="submit"
           disabled={!input.trim()}
-          className="p-3.5 bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-500/20 border border-emerald-400/20 hover:bg-emerald-600 active:scale-95 disabled:bg-slate-900 disabled:border-slate-850 disabled:text-slate-600 disabled:shadow-none transition-all"
+          className="p-3.5 bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-500/20 border border-emerald-400/20 hover:bg-emerald-600 active:scale-95 disabled:bg-slate-900 disabled:border-slate-850 disabled:text-slate-600 disabled:shadow-none transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          aria-label="Send Message"
         >
           <Send className="w-4 h-4" />
         </button>
