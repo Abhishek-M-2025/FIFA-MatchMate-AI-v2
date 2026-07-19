@@ -9,7 +9,7 @@ interface EmergencyPanelProps {
   t: any;
 }
 
-export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ liveData, isOpen, onToggle, t }) => {
+export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ isOpen, onToggle, t }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();

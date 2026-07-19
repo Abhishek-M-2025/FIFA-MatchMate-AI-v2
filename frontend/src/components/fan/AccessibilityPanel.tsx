@@ -9,7 +9,7 @@ interface AccessibilityPanelProps {
   t: any;
 }
 
-export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ liveData, isOpen, onToggle, t }) => {
+export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ isOpen, onToggle, t }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
