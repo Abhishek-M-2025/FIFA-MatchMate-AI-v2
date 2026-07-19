@@ -9,12 +9,12 @@ This project features a fully refactored, robust, modular software engineering a
 
 ## 📸 Dashboard Preview
 
-### Fan Dashboard
+### Fan Dashboard:👇
 
 <img width="1880" height="907" alt="Image" src="https://github.com/user-attachments/assets/adf58d12-7c1b-4a72-a163-6ed1e6db4f3b" />
 
 
-### Organizer Dashboard
+### Organizer Dashboard:👇
 
 <img width="1872" height="907" alt="Image" src="https://github.com/user-attachments/assets/88386f70-4dc8-4286-84c6-1f8f6058ed95" />
 
@@ -205,7 +205,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 python -m uvicorn main:app --reload --port 8000
 ```
-*The FastAPI backend will run on [http://localhost:8001](http://localhost:8000).*
+*The FastAPI backend will run on [http://localhost:8000](http://localhost:8000).*
 
 ### 3. Run the Frontend (React + Vite)
 Open a new terminal window, navigate to the `frontend/` directory, install packages, and start Vite:
