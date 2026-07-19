@@ -7,6 +7,17 @@ This project features a fully refactored, robust, modular software engineering a
 
 ---
 
+## 📸 Dashboard Preview
+
+### Fan Dashboard
+
+<img width="1880" height="907" alt="Image" src="https://github.com/user-attachments/assets/adf58d12-7c1b-4a72-a163-6ed1e6db4f3b" />
+
+
+### Organizer Dashboard
+
+<img width="1872" height="907" alt="Image" src="https://github.com/user-attachments/assets/88386f70-4dc8-4286-84c6-1f8f6058ed95" />
+
 ## 🏗️ Architecture & Interaction Flow
 
 ```mermaid
@@ -177,7 +188,7 @@ In the root directory, create a `.env` file (copied from `.env.example`).
 ```ini
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 PORT=8001
-VITE_API_URL=http://localhost:8001
+VITE_API_URL=http://localhost:8000
 ```
 
 ### 2. Run the Backend (FastAPI)
@@ -192,9 +203,9 @@ python -m venv venv
 source venv/bin/activate
 
 pip install -r requirements.txt
-python -m uvicorn main:app --reload --port 8001
+python -m uvicorn main:app --reload --port 8000
 ```
-*The FastAPI backend will run on [http://localhost:8001](http://localhost:8001).*
+*The FastAPI backend will run on [http://localhost:8001](http://localhost:8000).*
 
 ### 3. Run the Frontend (React + Vite)
 Open a new terminal window, navigate to the `frontend/` directory, install packages, and start Vite:
@@ -231,3 +242,15 @@ npm run test
 1. **Real telemetric integration**: Transition the current simulated telemetry background loops to active WebSocket connections pulling from AWS Iot Core or direct Kafka topics.
 2. **Offline Local LLMs**: Embed lightweight, client-side WebAssembly LLMs (like ONNX Runtime Web or WebLLM) to perform the fallback operations in-browser.
 3. **Advanced GIS Layout**: Replace the mock Leaflet tiles with live 3D photorealistic layouts utilizing Three.js and Mapbox GL JS stadium blueprints.
+
+   ---
+
+## 👨‍💻 Author
+
+**Abhishek** ❤️
+
+Made with ❤️ for **Prompt Wars Virtual Challenge 4**
+
+## 📄 License
+
+This project is created for educational and hackathon purposes.
